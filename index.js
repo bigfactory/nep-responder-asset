@@ -3,6 +3,7 @@ var nodepath = require('path');
 var async = require('async');
 var mime = require('mime');
 var request = require('nep-request');
+var isUtf8 = require('is-utf8');
 
 module.exports = function(req, res, next, data) {
 
@@ -12,10 +13,15 @@ module.exports = function(req, res, next, data) {
 
     files = asset.getRequestFiles();
     extname = nodepath.extname(files[0]) || '.js';
-    res.set('content-type', mime.lookup(extname));
 
     files = asset.sortRequestFiles(files);
 
+    if(files.length == 1 && files[0].type == 'local'){
+        sendSingleFile(files[0].path, res);
+        return;
+    }
+
+    res.set('content-type', mime.lookup(extname));
     getters = asset.makeGetter(files);
     async.parallel(getters, function(err, results) {
         if (err) {
@@ -26,6 +32,20 @@ module.exports = function(req, res, next, data) {
         });
         res.end();
     });
+}
+
+function sendSingleFile(file, res){
+    var charset;
+    var buf = fs.readFileSync(file);
+    
+    if(isUtf8(buf)){
+        charset = 'utf-8';
+    }
+    else{
+        charset = 'gbk';
+    }
+    res.set('content-type', mime.lookup(file)+'; charset='+charset);
+    res.send(buf);
 }
 
 

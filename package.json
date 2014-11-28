@@ -1,6 +1,6 @@
 {
   "name": "nep-responder-asset",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "asset responder for nep",
   "main": "index.js",
   "author": {
@@ -14,6 +14,7 @@
   "license": "ISC",
   "dependencies": {
     "async": "^0.9.0",
+    "is-utf8": "^0.2.0",
     "mime": "^1.2.11",
     "nep-request": "~0"
   }
